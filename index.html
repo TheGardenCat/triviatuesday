@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NEON ROCK TRIVIA • HOST CONTROLS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #010101);
+            font-family: system-ui, 'Segoe UI', 'Impact', 'Arial Black', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            display:flex;
+            flex-direction:column;
+            justify-content: center;
+            align-items:center;
+            position:fixed;
+            overflow:hidden;
+        }
+
+        .neon-card {
+            width: 90%;
+            max-width: 1400px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            border-radius: 70px;
+            padding: 2rem 2.5rem 2rem;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), 0 0 30px rgba(255, 20, 147, 0.4);
+            border: 2px solid cyan;
+            animation: neonPulse 1.8s infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            0% { box-shadow: 0 0 8px #0ff, 0 0 18px #f0f; border-color: #0ff8; }
+            100% { box-shadow: 0 0 24px #ff44ff, 0 0 40px cyan; border-color: #ff44ff; }
+        }
+
+        .fast-flash {
+            animation: fastNeonFlash 0.15s infinite alternate !important;
+        }
+
+        @keyframes fastNeonFlash {
+            0% { box-shadow: 0 0 30px #ff00cc, 0 0 45px #00e0ff; border-color: #ff00cc; }
+            100% { box-shadow: 0 0 60px #ff44aa, 0 0 90px cyan; border-color: cyan; }
+        }
+
+        .category-badge {
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, cyan, hotpink);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 8px magenta;
+        }
+
+        .question-text {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #fff5e6;
+            text-align: center;
+            margin: 1.5rem 0;
+            line-height: 1.3;
+            text-shadow: 0 0 6px #ff44aa;
+        }
+
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background: rgba(0,0,0,0.7);
+            padding: 0.6rem 2rem;
+            border-radius: 80px;
+            backdrop-filter: blur(6px);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .progress {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffdd88;
+            text-shadow: 0 0 5px orange;
+        }
+
+        .timer {
+            font-size: 5rem;
+            font-family: monospace;
+            font-weight: 900;
+            background: #000000bb;
+            padding: 0.2rem 1.6rem;
+            border-radius: 4rem;
+            color: #0ff;
+            text-shadow: 0 0 12px cyan;
+            letter-spacing: 6px;
+        }
+
+        .waiting-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px dashed rgba(0,255,255,0.6);
+        }
+
+        .waiting-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd966;
+        }
+
+        .waiting-sub {
+            font-size: 1rem;
+            margin-top: 0.8rem;
+            color: #aaffdd;
+        }
+
+        .host-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.8rem 0 1rem;
+            flex-wrap: wrap;
+        }
+
+        .host-btn {
+            background: #111;
+            border: 2px solid cyan;
+            color: cyan;
+            font-size: 1.6rem;
+            font-weight: bold;
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.1s;
+            backdrop-filter: blur(4px);
+        }
+
+        .host-btn:hover:not(:disabled) {
+            background: cyan;
+            color: black;
+            box-shadow: 0 0 15px cyan;
+        }
+
+        .host-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .reveal-btn {
+            border-color: #ff66cc;
+            color: #ff66cc;
+        }
+        .reveal-btn:hover:not(:disabled) {
+            background: #ff66cc;
+            color: black;
+        }
+
+        .next-btn {
+            border-color: #ffaa44;
+            color: #ffaa44;
+        }
+        .next-btn:hover:not(:disabled) {
+            background: #ffaa44;
+            color: black;
+        }
+
+        .reveal-panel {
+            background: #0a0e1ccc;
+            border-radius: 48px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 12px solid cyan;
+            border-right: 12px solid fuchsia;
+        }
+
+        .answer-reveal {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f9f047, #ff66cc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+        }
+
+        .funfact-text {
+            font-size: 1.8rem;
+            line-height: 1.4;
+            color: #f0f0ff;
+        }
+
+        .pencils-down-badge {
+            display: inline-block;
+            background: #cc3300aa;
+            font-size: 1.7rem;
+            padding: 0.4rem 1.8rem;
+            border-radius: 40px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .start-screen, .final-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            text-align: center;
+        }
+
+       /*.neon-title {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, cyan, hotpink, purple);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px cyan;
+        }
+
+     
+
+        .sub {
+    font-size: 1.8rem;
+    color: #ccddff;
+    text-shadow: 0 0 4px #00aaff;
+    margin: 0.5rem 0;*\
+}
+
+/* Fallback for neon-title in case gradient fails */
+.neon-title {
+    color: cyan; /* visible fallback */
+    font-size: 3rem;
+    padding: 1rem 2.5rem;
+   /* text-shadow: 0 0 8px magenta;*/
+}
+
+.sub {
+   color: magenta;
+            font-size: 3rem;
+            padding: 1rem 2.5rem;
+}
+
+        .big-neon-btn {
+            background: none;
+            border: 3px solid cyan;
+            color: cyan;
+            font-size: 2rem;
+            padding: 1rem 2.5rem;
+            border-radius: 80px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(12px);
+        }
+
+        .big-neon-btn:hover {
+            background: cyan;
+            color: black;
+            box-shadow: 0 0 35px cyan;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        @media (max-width: 800px) {
+            .question-text { font-size: 2.2rem; }
+            .timer { font-size: 2.5rem; }
+            .waiting-message { font-size: 1.5rem; }
+            .host-btn { font-size: 1.2rem; padding: 0.6rem 1.2rem; }
+            .answer-reveal { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameRoot">
+    <!-- START SCREEN -->
+    <div id="startScreen" class="neon-card start-screen">
+        <div class="sub">⚡ TRIVIA TUESDAY | DIVE BAR EDITION ⚡</div>
+        <button id="startGameBtn" class="big-neon-btn">🔊 START THE GAME</button>
+       
+    </div>
+ <!-- BACK IN GAME CONTAINER <div style="margin-top: 20px; font-size:1.2rem; color:#aaa;">✦ 60 second countdown ✦</div>-->
+   
+ 
+ <!-- MAIN GAME UI -->
+    <div id="gameUI" class="hide" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <div class="neon-card" id="neonBox">
+            <div class="category-badge" id="categoryLabel">POP MUSIC</div>
+            <div class="info-panel">
+                <span class="progress" id="progressIndicator">Question 1 of 40</span>
+                <span class="timer" id="timerDisplay">60</span>
+            </div>
+            <div class="question-text" id="questionText">Loading...</div>
+            
+            <!-- WAITING ZONE -->
+            <div id="waitingArea" class="waiting-area">
+                <div class="waiting-message">✏️ PLAYERS WRITE YOUR ANSWER AND PASS TO THE THE TEAM CAPTAIN✏️</div>
+                <div class="waiting-sub">🎤 Host will click STOP CLOCK when everyone is done or let timer run</div>
+            </div>
+
+             <!-- REVEAL PANEL -->
+            <div id="revealArea" class="reveal-panel hide">
+                <div id="pencilsDownBadge" class="pencils-down-badge">✏️ PENCILS DOWN! ✏️</div>
+                <div id="correctAnswerDisplay" class="answer-reveal"></div>
+                <div id="funFactDisplay" class="funfact-text"></div>
+            </div>
+
+            <!-- HOST BUTTONS -->
+            <div id="hostControls" class="host-controls">
+                <button id="stopCountdownBtn" class="host-btn">⏹️ STOP CLOCK</button>
+                <button id="revealAnswerBtn" class="host-btn reveal-btn" disabled>🔍 ANSWER</button>
+                <button id="nextQuestionBtn" class="host-btn next-btn" disabled>➡️ NEXT Q</button>
+            </div>
+
+           
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="finalScreen" class="neon-card final-screen hide">
+        <div class="neon-title">🎤 GAME OVER 🎤</div>
+        <button id="restartFinalBtn" class="big-neon-btn">🔁 PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // ======================= 40 TRIVIA QUESTIONS =======================
+    const QUESTIONS = [
+        { category: "Pop Music", question: "Which Elvis song was his first Billboard No. 1 hit?", correctAnswer: "Heartbreak Hotel", funFact: "Elvis recorded 'Heartbreak Hotel' in 1956, and it became his first No. 1 hit." },
+        { category: "Pop Music", question: "Which Motown group recorded 'Where Did Our Love Go'?", correctAnswer: "The Supremes", funFact: "The Supremes became Motown's most successful act with 12 No. 1 hits." },
+        { category: "Pop Music", question: "'Proud Mary' was a huge hit for which CCR frontman?", correctAnswer: "John Fogerty", funFact: "Creedence Clearwater Revival recorded it in 1969, later covered by Tina Turner." },
+        { category: "Pop Music", question: "Which 1977 song by Fleetwood Mac became an anthem?", correctAnswer: "Dreams", funFact: "Dreams is the band's only US No. 1 hit." },
+        { category: "Pop Music", question: "Who sang 'Respect' in 1967?", correctAnswer: "Aretha Franklin", funFact: "Originally written by Otis Redding, Aretha's version became feminist anthem." },
+        { category: "Pop Music", question: "Which Beatles album features 'Here Comes the Sun'?", correctAnswer: "Abbey Road", funFact: "Written by George Harrison, one of his most loved tracks." },
+        { category: "Pop Music", question: "Which singer fronted The Doors?", correctAnswer: "Jim Morrison", funFact: "Morrison died in 1971 but remains a rock legend." },
+        { category: "Pop Music", question: "What year did Woodstock take place?", correctAnswer: "1969", funFact: "Iconic festival attracted half a million people." },
+        { category: "Pop Music", question: "'I Heard It Through the Grapevine' hit No.1 for which Motown star?", correctAnswer: "Marvin Gaye", funFact: "Marvin Gaye's version is considered definitive." },
+        { category: "Pop Music", question: "Which band sang 'Stairway to Heaven'?", correctAnswer: "Led Zeppelin", funFact: "Epic rock anthem never released as single but legendary." },
+        { category: "Popular Books", question: "Which novel features sisters Meg, Jo, Beth, and Amy?", correctAnswer: "Little Women", funFact: "Louisa May Alcott's classic published 1868, beloved for generations." },
+        { category: "Popular Books", question: "S.E. Hinton wrote which coming-of-age classic about greasers?", correctAnswer: "The Outsiders", funFact: "Hinton wrote it at age 16, remains YA masterpiece." },
+        { category: "Popular Books", question: "Which Kathryn Stockett novel deals with maids in 1960s Mississippi?", correctAnswer: "The Help", funFact: "Spent over 100 weeks on NYT bestseller list." },
+        { category: "Popular Books", question: "Nicholas Sparks' novel about a dementia patient's love story?", correctAnswer: "The Notebook", funFact: "Adapted into a blockbuster film starring Ryan Gosling." },
+        { category: "Popular Books", question: "Margaret Simon talks to God in which Judy Blume book?", correctAnswer: "Are You There God? It’s Me, Margaret", funFact: "Often challenged but beloved for its honesty about adolescence." },
+        { category: "Popular Books", question: "'Eat, Pray, Love' memoir is by which author?", correctAnswer: "Elizabeth Gilbert", funFact: "Inspired a generation to travel and find self-love." },
+        { category: "Popular Books", question: "Who wrote 'Gone with the Wind'?", correctAnswer: "Margaret Mitchell", funFact: "Won Pulitzer Prize in 1937, one of best-selling novels." },
+        { category: "Popular Books", question: "'The Joy Luck Club' explores mother-daughter relationships by?", correctAnswer: "Amy Tan", funFact: "Adapted into a touching film in 1993." },
+        { category: "Popular Books", question: "Diana Gabaldon's time-travel series started with?", correctAnswer: "Outlander", funFact: "Hit TV series renewed multiple seasons." },
+        { category: "Popular Books", question: "Which novel begins 'It is a truth universally acknowledged...'?", correctAnswer: "Pride and Prejudice", funFact: "Jane Austen's most celebrated romance." },
+        { category: "Recipe Ingredient ID", question: "Which ingredient gives pesto its signature bright green color & herby punch?", correctAnswer: "Basil", funFact: "Traditional pesto alla genovese uses fresh basil, pine nuts, parmesan." },
+        { category: "Recipe Ingredient ID", question: "What gives chocolate lava cake its gooey molten center?", correctAnswer: "Underbaked batter", funFact: "Molten center achieved by baking just until edges set." },
+        { category: "Recipe Ingredient ID", question: "Which spice is the main flavor in chai masala (warm, peppery)?", correctAnswer: "Cardamom", funFact: "Green cardamom gives sweet aromatic note." },
+        { category: "Recipe Ingredient ID", question: "Key ingredient for hummus's creamy texture beside chickpeas?", correctAnswer: "Tahini", funFact: "Tahini is ground sesame paste, essential for hummus." },
+        { category: "Recipe Ingredient ID", question: "What makes ranch dressing tangy?", correctAnswer: "Buttermilk", funFact: "Cultured buttermilk gives signature tang & thickness." },
+        { category: "Recipe Ingredient ID", question: "Which starch is the main thickener for classic gravy?", correctAnswer: "Flour", funFact: "Roux made from fat and flour is the base." },
+        { category: "Recipe Ingredient ID", question: "Which ingredient gives Caesar dressing its signature savory flavor?", correctAnswer: "Anchovies", funFact: "Anchovies add umami depth — even people who dislike them enjoy the flavor." },
+        { category: "Recipe Ingredient ID", question: "Which acid is often added to guacamole to prevent browning?", correctAnswer: "Lime juice", funFact: "Lime adds flavor and vitamin C inhibits oxidation." },
+        { category: "Recipe Ingredient ID", question: "Which cheese is the star of a classic tiramisu?", correctAnswer: "Mascarpone", funFact: "Italian double cream cheese, smooth and rich." },
+        { category: "Recipe Ingredient ID", question: "What gives red velvet cake its signature color (two ingredients)?", correctAnswer: "Cocoa powder + buttermilk", funFact: "Natural cocoa reacts with acid giving reddish hue." },
+        { category: "Are you smarter than an 8th Grader?", question: "What organelle is the 'powerhouse of the cell'?", correctAnswer: "Mitochondria", funFact: "Mitochondria generate ATP energy through respiration." },
+        { category: "Are you smarter than an 8th Grader?", question: "What do we call a word that has the opposite meaning of another word?", correctAnswer: "Antonym", funFact: "‘Hot’ and ‘cold’ are one of the most common antonym pairs."},
+        { category: "Are you smarter than an 8th Grader?", question: "Which amendment abolished slavery in the US?", correctAnswer: "13th", funFact: "Ratified in 1865 after Civil War." },
+        { category: "Are you smarter than an 8th Grader?", question: "Who wrote 'The Tell-Tale Heart'?", correctAnswer: "Edgar Allan Poe", funFact: "Master of gothic horror, published 1843." },
+        { category: "Are you smarter than an 8th Grader?", question: "What is the Pythagorean theorem formula?", correctAnswer: "a²+b²=c²", funFact: "Applies to right triangles, foundational geometry." },
+        { category: "Are you smarter than an 8th Grader?", question: "Which war was fought between the North and South (US)?", correctAnswer: "Civil War", funFact: "1861-1865, pivotal in American history." },
+        { category: "Are you smarter than an 8th Grader?", question: "Transport oxygen & nutrients is the main function of this system?", correctAnswer: "Circulatory", funFact: "Heart pumps blood through vessels." },
+        { category: "Are you smarter than an 8th Grader?", question: "What is the square root of 144?", correctAnswer: "12", funFact: "12² = 144, basic math fact." },
+        { category: "Are you smarter than an 8th Grader?", question: "In 'Romeo and Juliet', which family does Juliet belong to?", correctAnswer: "Capulet", funFact: "Star-crossed lovers from rival houses." },
+        { category: "Are you smarter than an 8th Grader?", question: "Which planet is known as the 'Red Planet'?", correctAnswer: "Mars", funFact: "Iron oxide gives reddish appearance." }
+    ];
+
+    // ------------------- GLOBALS -------------------
+    let currentQIndex = 0;
+    let timerSeconds = 60;
+    let timerIntervalId = null;
+    let rockMusicInterval = null;
+    let audioCtx = null;
+    let currentBPM = 120;
+    let stepCounter = 0;
+    let musicActive = false;
+    
+    // Game state machine:
+    // 'countdown' -> timer & music running, stop button enabled, reveal/next disabled
+    // 'pencils_down' -> timer stopped, reveal button enabled, next disabled
+    // 'answer_shown' -> answer revealed, next enabled, stop/reveal disabled
+    let gameState = 'countdown'; 
+
+    // DOM elements
+    const startScreenDiv = document.getElementById('startScreen');
+    const gameUIDiv = document.getElementById('gameUI');
+    const finalScreenDiv = document.getElementById('finalScreen');
+    const categoryLabel = document.getElementById('categoryLabel');
+    const questionTextEl = document.getElementById('questionText');
+    const progressIndicator = document.getElementById('progressIndicator');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const waitingArea = document.getElementById('waitingArea');
+    const revealArea = document.getElementById('revealArea');
+    const correctAnswerDisplay = document.getElementById('correctAnswerDisplay');
+    const funFactDisplay = document.getElementById('funFactDisplay');
+    const neonBox = document.getElementById('neonBox');
+    const stopBtn = document.getElementById('stopCountdownBtn');
+    const revealBtn = document.getElementById('revealAnswerBtn');
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    const startBtn = document.getElementById('startGameBtn');
+    const restartFinalBtn = document.getElementById('restartFinalBtn');
+
+    // ------------------- AUDIO ENGINE -------------------
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+    function playPencilsDownSound() {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(220, now + 0.5);
+        gain.gain.setValueAtTime(0.45, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+        osc.start();
+        osc.stop(now + 0.7);
+        const bufferSize = 4096;
+        const noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+        noiseNode.onaudioprocess = function(e) { const output = e.outputBuffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.25; };
+        const noiseGain = audioCtx.createGain();
+        noiseNode.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+        noiseGain.gain.setValueAtTime(0.35, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+        noiseNode.start && noiseNode.start(now);
+        setTimeout(() => { try { noiseNode.disconnect(); } catch(e){} }, 500);
+    }
+
+    function stopRockMusic() {
+        if (rockMusicInterval) { clearInterval(rockMusicInterval); rockMusicInterval = null; }
+        musicActive = false;
+    }
+
+    function scheduleRockBeat() {
+        if (!musicActive || !audioCtx || gameState !== 'countdown') return;
+        const now = audioCtx.currentTime;
+        const step = stepCounter % 8;
+        if (step === 0 || step === 4) {
+            const kick = audioCtx.createOscillator();
+            const kickGain = audioCtx.createGain();
+            kick.connect(kickGain);
+            kickGain.connect(audioCtx.destination);
+            kick.frequency.value = 80;
+            kick.type = 'sine';
+            kickGain.gain.setValueAtTime(0.45, now);
+            kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            kick.start(); kick.stop(now + 0.2);
+        }
+        if (step === 2 || step === 6) {
+            const snare = audioCtx.createOscillator();
+            const snareGain = audioCtx.createGain();
+            snare.connect(snareGain);
+            snareGain.connect(audioCtx.destination);
+            snare.frequency.value = 180;
+            snare.type = 'triangle';
+            snareGain.gain.setValueAtTime(0.35, now);
+            snareGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            snare.start(); snare.stop(now + 0.15);
+        }
+        if (step === 0 || step === 4) {
+            const chord = audioCtx.createOscillator();
+            const chordGain = audioCtx.createGain();
+            chord.connect(chordGain);
+            chordGain.connect(audioCtx.destination);
+            chord.frequency.value = 196;
+            chord.type = 'sawtooth';
+            chordGain.gain.setValueAtTime(0.22, now);
+            chordGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+            chord.start(); chord.stop(now + 0.25);
+        }
+        stepCounter++;
+    }
+
+    function startRockCountdown() {
+        stopRockMusic();
+        if (gameState !== 'countdown') return;
+        musicActive = true;
+        stepCounter = 0;
+        const intervalMs = (60000 / currentBPM) / 2;
+        rockMusicInterval = setInterval(() => { scheduleRockBeat(); }, intervalMs);
+    }
+
+    function updateRockTempo(secondsLeft) {
+        if (gameState !== 'countdown') return;
+        if (secondsLeft <= 3 && currentBPM !== 200) {
+            currentBPM = 200;
+            stopRockMusic();
+            startRockCountdown();
+            neonBox.classList.add('fast-flash');
+        } else if (secondsLeft > 3 && currentBPM !== 120) {
+            currentBPM = 120;
+            stopRockMusic();
+            startRockCountdown();
+            neonBox.classList.remove('fast-flash');
+        }
+    }
+
+    // ------------------- UI STATE MANAGEMENT -------------------
+    function updateButtonStates() {
+        if (gameState === 'countdown') {
+            stopBtn.disabled = false;
+            revealBtn.disabled = true;
+            nextBtn.disabled = true;
+        } else if (gameState === 'pencils_down') {
+            stopBtn.disabled = true;
+            revealBtn.disabled = false;
+            nextBtn.disabled = true;
+        } else if (gameState === 'answer_shown') {
+            stopBtn.disabled = true;
+            revealBtn.disabled = true;
+            nextBtn.disabled = false;
+        }
+    }
+
+    function stopTimerAndMusic() {
+        if (timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; }
+        stopRockMusic();
+        musicActive = false;
+    }
+
+    // called by host "STOP COUNTDOWN" button
+    function forcePencilsDown() {
+        if (gameState !== 'countdown') return;
+        // stop timer & music
+        stopTimerAndMusic();
+        // play sound
+        playPencilsDownSound();
+        // show reveal panel but without answer yet
+        revealArea.classList.remove('hide');
+        document.getElementById('pencilsDownBadge').innerHTML = "⏰ PENCILS DOWN! (Host stopped early) ⏰";
+        correctAnswerDisplay.textContent = "";
+        funFactDisplay.textContent = "🔒 Host, click SHOW ANSWER to reveal.";
+        waitingArea.classList.add('hide');
+        // change state
+        gameState = 'pencils_down';
+        updateButtonStates();
+        neonBox.classList.add('fast-flash');
+        setTimeout(() => neonBox.classList.remove('fast-flash'), 800);
+    }
+
+    // called when timer naturally expires
+    async function handleTimerExpired() {
+        if (gameState !== 'countdown') return;
+        stopTimerAndMusic();
+        playPencilsDownSound();
+        revealArea.classList.remove('hide');
+        document.getElementById('pencilsDownBadge').innerHTML = "⌛ TIME'S UP! PENCILS DOWN! ⌛";
+        correctAnswerDisplay.textContent = "";
+        funFactDisplay.textContent = "🎤 Host, click SHOW ANSWER to reveal.";
+        waitingArea.classList.add('hide');
+        gameState = 'pencils_down';
+        updateButtonStates();
+        neonBox.classList.add('fast-flash');
+        setTimeout(() => neonBox.classList.remove('fast-flash'), 800);
+    }
+
+    // reveal answer and fun fact
+    function revealAnswer() {
+        if (gameState !== 'pencils_down') return;
+        const q = QUESTIONS[currentQIndex];
+        correctAnswerDisplay.innerHTML = `✅ CORRECT ANSWER: ${q.correctAnswer} ✅`;
+        funFactDisplay.innerHTML = q.funFact;
+        document.getElementById('pencilsDownBadge').innerHTML = "📢 ANSWER REVEALED 📢";
+        gameState = 'answer_shown';
+        updateButtonStates();
+    }
+
+    function goToNextQuestion() {
+        if (gameState !== 'answer_shown') return;
+        if (currentQIndex + 1 < QUESTIONS.length) {
+            currentQIndex++;
+            loadQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    // Timer logic
+    function startTimer() {
+        if (timerIntervalId) clearInterval(timerIntervalId);
+        timerSeconds = 60;
+        updateTimerUI();
+        timerIntervalId = setInterval(() => {
+            if (gameState !== 'countdown') return;
+            if (timerSeconds <= 1) {
+                clearInterval(timerIntervalId);
+                timerIntervalId = null;
+                handleTimerExpired();
+            } else {
+                timerSeconds--;
+                updateTimerUI();
+                if (timerSeconds <= 3) {
+                    updateRockTempo(timerSeconds);
+                } else if (timerSeconds === 4) {
+                    neonBox.classList.remove('fast-flash');
+                    if (currentBPM !== 120) {
+                        currentBPM = 120;
+                        stopRockMusic();
+                        if (gameState === 'countdown') startRockCountdown();
+                    }
+                }
+            }
+        }, 1000);
+    }
+
+    function updateTimerUI() { timerDisplay.textContent = timerSeconds; }
+
+    function loadQuestion() {
+        // Reset everything
+        stopTimerAndMusic();
+        gameState = 'countdown';
+        // UI reset
+        revealArea.classList.add('hide');
+        waitingArea.classList.remove('hide');
+        document.getElementById('pencilsDownBadge').innerHTML = "✏️ PENCILS DOWN! ✏️";
+        correctAnswerDisplay.innerHTML = "";
+        funFactDisplay.innerHTML = "";
+        neonBox.classList.remove('fast-flash');
+        // load new question data
+        const q = QUESTIONS[currentQIndex];
+        categoryLabel.textContent = q.category;
+        questionTextEl.textContent = q.question;
+        progressIndicator.textContent = `Question ${currentQIndex+1} of ${QUESTIONS.length}`;
+        timerSeconds = 60;
+        updateTimerUI();
+        // reset audio tempo
+        currentBPM = 120;
+        // start fresh timer & music
+        startTimer();
+        startRockCountdown();
+        updateButtonStates();
+    }
+
+    function endGame() {
+        stopTimerAndMusic();
+        gameUIDiv.classList.add('hide');
+        finalScreenDiv.classList.remove('hide');
+    }
+
+    function startGameSession() {
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        currentQIndex = 0;
+        startScreenDiv.classList.add('hide');
+        finalScreenDiv.classList.add('hide');
+        gameUIDiv.classList.remove('hide');
+        loadQuestion();
+    }
+
+    function resetFullGame() {
+        stopTimerAndMusic();
+        startGameSession();
+    }
+
+    // Attach event listeners
+    startBtn.onclick = () => { initAudio(); if(audioCtx) audioCtx.resume().then(()=> startGameSession()); else startGameSession(); };
+    restartFinalBtn.onclick = () => { initAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); resetFullGame(); };
+    stopBtn.onclick = () => { forcePencilsDown(); };
+    revealBtn.onclick = () => { revealAnswer(); };
+    nextBtn.onclick = () => { goToNextQuestion(); };
+    
+    document.body.addEventListener('click', ()=> { if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); });
+    console.log("Ready: Host-controlled trivia with robust state machine.");
+</script>
+</body>
+</html>
